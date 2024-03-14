@@ -1,4 +1,4 @@
-# \[Group name\]
+# \[Miguel og Chris\]
 
 **Group members:**
 - A
