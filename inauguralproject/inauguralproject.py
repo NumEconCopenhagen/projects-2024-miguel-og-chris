@@ -47,6 +47,7 @@ class ExchangeEconomyClass:
         return [self.par.alpha * I / p1, (1-self.par.alpha) * I]
 
     def demand_B(self,p1):
+        I = p1 * self.par.w1B + self.par.w2B
         return [self.par.beta * I / p1, (1-self.par.beta) * I]
 
     def check_market_clearing(self,p1):
