@@ -49,6 +49,16 @@ class ExchangeEconomyClass:
     def demand_B(self,p1):
         I = p1 * self.par.w1B + self.par.w2B
         return [self.par.beta * I / p1, (1-self.par.beta) * I]
+    
+    # Demand functions functions with endowments as inputs
+
+    def demand_A_endowment(self, w1A, w2A, p1):
+        I = p1 * w1A + w2A
+        return [self.par.alpha * I / p1, (1-self.par.alpha) * I]
+
+    def demand_B_endowment(self, w1B, w2B, p1):
+        I = p1 * w1B + w2B
+        return [self.par.beta * I / p1, (1-self.par.beta) * I]
 
     def check_market_clearing(self,p1):
 
@@ -59,6 +69,19 @@ class ExchangeEconomyClass:
 
         eps1 = x1A-par.w1A + x1B-(1-par.w1A) #Excess demand of good 1.
         eps2 = x2A-par.w2A + x2B-(1-par.w2A) #Excess demand of good 2.
+
+        return eps1,eps2
+    
+    # Check market clearing with endowments as inputs
+    def check_market_clearing_endowment(self, w1A, w2A, w1B, w2B, p1):
+
+        par = self.par
+
+        x1A,x2A = self.demand_A_endowment(w1A, w2A, p1)
+        x1B,x2B = self.demand_B_endowment(w1B, w2B, p1)
+
+        eps1 = x1A-w1A + x1B-(1-w1A) #Excess demand of good 1.
+        eps2 = x2A-w2A + x2B-(1-w2A) #Excess demand of good 2.
 
         return eps1,eps2
     
