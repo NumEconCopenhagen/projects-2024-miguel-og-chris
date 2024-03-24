@@ -1,9 +1,8 @@
 # \[Miguel og Chris\]
 
 **Group members:**
-- A
-- B
-- C
+- Mikkel Krakau Holm, vck704
+- Christopher la Cour Asboe, bvj626
 
 This repository contains  
 1. Inaugural project. 
