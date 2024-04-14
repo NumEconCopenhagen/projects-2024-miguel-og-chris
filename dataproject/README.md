@@ -10,5 +10,3 @@ We apply the **following datasets**:
 1. dataY.csv (*source*)
 
 **Dependencies:** Apart from a standard Anaconda Python 3 installation, the project requires the following installations:
-
-``pip install matplotlib-venn``
