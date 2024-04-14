@@ -1,12 +1,13 @@
 # Data analysis project
 
-Our project is titled **PROJECT TITLE** and is about EXPLAIN.
+- Mikkel Krakau Holm, vck704
+- Christopher la Cour Asboe, bvj626
 
-The **results** of the project can be seen from running [dataproject.ipynb](dataproject.ipynb).
+Our project is titled 'Relationship between public debt and GDP growth' and seeks to analyse the relationship GDP growth and Public debt for Sub-Saharan countries specifically looking at differences in this relationship for different kind of countries. 
 
-We apply the **following datasets**:
+We apply the following datasets:
 
-1. dataX.csv (*source*) 
-1. dataY.csv (*source*)
+1. DebtData-All.csv  (source: https://www.imf.org/external/datamapper/GGXWDG_GDP@AFRREO/SSA/OEXP/OIMP/STP/ZMB/ERI)
+2. GDPGrowthData-All.csv (source:https://www.imf.org/external/datamapper/NGDPRPC_PCH@AFRREO/SSA/OEXP/OIMP/ERI)
 
-**Dependencies:** Apart from a standard Anaconda Python 3 installation, the project requires the following installations:
+Which is retrieved from IMF's database 'AFR REGIONAL ECONOMIC OUTLOOK'. The definitions of the different groups of countries can be found in the statistical appendix for the database. 
