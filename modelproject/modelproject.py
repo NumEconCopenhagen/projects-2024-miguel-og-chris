@@ -22,6 +22,30 @@ def solve_ss(alpha, c):
     
     return result
 
+from scipy import optimize
+import matplotlib.pyplot as plt
+
+def solve_ss(alpha, c):
+    """ Example function. Solve for steady state k. 
+
+    Args:
+        c (float): costs
+        alpha (float): parameter
+
+    Returns:
+        result (RootResults): the solution represented as a RootResults object.
+
+    """ 
+    
+    # a. Objective function, depends on k (endogenous) and c (exogenous).
+    f = lambda k: k**alpha - c
+    obj = lambda kss: kss - f(kss)
+
+    #. b. call root finder to find kss.
+    result = optimize.root_scalar(obj,bracket=[0.1,100],method='bisect')
+    
+    return result
+
 
 
 # Model Equations
@@ -122,14 +146,14 @@ class MalthusEconomyStochasticTechnology:
 
         # a. preferences
         par.alpha = 0.5
-        par.eta = 1
-        par.mu = 1
+        par.eta = 0.5
+        par.mu = 0.5
         par.X = 1
         par.A_0 = 1
         par.A_mean = 0
-        par.A_sigma = 0.005
-        par.g_A = 0.00
-        par.L_0 = 1000000
+        par.A_sigma = 0.002
+        par.g_A = 0.02
+        par.L_0 = 1
 
     # Production function
 
@@ -169,7 +193,7 @@ class MalthusEconomyStochasticTechnology:
 
 
     def solve_ss(self):
-        N = 1000
+        N = 200
         L_t = self.par.L_0
         A_t = self.par.A_0
         population = [self.par.L_0]
@@ -181,8 +205,6 @@ class MalthusEconomyStochasticTechnology:
         for iterations in range(0,N,1):
             L_next = self.L_t1(L_t, A_t)
             A_next = self.A_t1(A_t)
-            if L_t == L_next:
-                ss_time.append[time[-1]]
             population.append(L_next)
             output_per_capita.append(self.output_per_capita(L_next, A_next))
             TFP.append(A_next)
@@ -190,11 +212,8 @@ class MalthusEconomyStochasticTechnology:
             L_t = L_next
             A_t = A_next
             
-        print("Periods in which steady state was reached:", ss_time)
-        print("Final population:", L_t)
         print("Final income per capita:", self.output_per_capita(L_t, A_t))
-        print("Population: ", population)
-        print("Time passed", time)
+        
 
         fig, ax1 = plt.subplots()
 
