@@ -1,4 +1,5 @@
 from scipy import optimize
+import matplotlib.pyplot as plt
 
 def solve_ss(alpha, c):
     """ Example function. Solve for steady state k. 
@@ -20,3 +21,199 @@ def solve_ss(alpha, c):
     result = optimize.root_scalar(obj,bracket=[0.1,100],method='bisect')
     
     return result
+
+
+
+# Model Equations
+
+from types import SimpleNamespace
+import numpy as np
+
+class MalthusEconomyBaseline:
+
+    def __init__(self):
+
+        par = self.par = SimpleNamespace()
+
+        # a. preferences
+        par.alpha = 0.5
+        par.eta = 0.5
+        par.mu = 0.5
+        par.X = 1
+        par.A = 1
+        par.L_0 = 2
+
+    # Production function
+
+    def output(self, L_t):
+        return L_t**(1-self.par.alpha)*(self.par.A*self.par.X)**self.par.alpha
+
+    # Output per capita
+
+    def output_per_capita(self, L_t):
+        return (self.par.A*self.par.X/L_t)**self.par.alpha
+
+    # Birth rate:
+
+    def birth_rate(self, L_t):
+        return self.par.eta*(self.par.A*self.par.X/L_t)**self.par.alpha
+
+    # Law of motion
+
+    def L_t1(self, L_t):
+        return self.par.eta*((self.par.A*self.par.X)**self.par.alpha)*L_t**(1-self.par.alpha)+(1-self.par.mu)*L_t
+
+    # Population steady state
+
+    def L_ss(self):
+        return ((self.par.eta/self.par.mu)**(1/self.par.alpha))*self.par.A*self.par.X
+
+    # output per capita steady state:
+
+    def output_per_capita_ss(self):
+        return self.par.mu/self.par.eta
+    
+    # Steady state solver
+
+
+    def solve_ss(self):
+        L_t = self.par.L_0
+        population = [self.par.L_0]
+        output_per_capita = [self.output_per_capita(self.par.L_0)]
+        time = [0]
+
+        while L_t != self.L_t1(L_t):
+            L_next = self.L_t1(L_t)
+            population.append(L_next)
+            output_per_capita.append(self.output_per_capita(L_next))
+            time.append(time[-1] + 1)
+            L_t = L_next
+            
+        print("Periods passed before steady state is reached:", time[-1])
+        print("Steady state population:", L_t)
+        print("Steady state income per capita:", self.output_per_capita(L_t))
+
+        fig, ax1 = plt.subplots()
+
+        color = 'tab:blue'
+        ax1.set_xlabel('Time')
+        ax1.set_ylabel('Population', color=color)
+        ax1.plot(time, population, color=color, label='Population')
+        ax1.tick_params(axis='y', labelcolor=color)
+
+        ax2 = ax1.twinx()  
+        color = 'tab:red'
+        ax2.set_ylabel('Output per capita', color=color)  
+        ax2.plot(time, output_per_capita, color=color, label='Output per capita')
+        ax2.tick_params(axis='y', labelcolor=color)
+
+        fig.tight_layout()  
+        plt.title("Population and Output per Capita over Time")
+        fig.legend(loc='center')
+        plt.show()
+        return
+   
+
+class MalthusEconomyStochasticTechnology:
+
+    def __init__(self):
+
+        par = self.par = SimpleNamespace()
+
+        # a. preferences
+        par.alpha = 0.5
+        par.eta = 1
+        par.mu = 1
+        par.X = 1
+        par.A_0 = 1
+        par.A_mean = 0
+        par.A_sigma = 0.005
+        par.g_A = 0.00
+        par.L_0 = 1000000
+
+    # Production function
+
+    def output(self, L_t):
+        return L_t**(1-self.par.alpha)*(self.par.A*self.par.X)**self.par.alpha
+
+    # Output per capita
+
+    def output_per_capita(self, L_t, A_t):
+        return (A_t*self.par.X/L_t)**self.par.alpha
+
+    # Birth rate:
+
+    def birth_rate(self, L_t, A_t):
+        return self.par.eta*(A_t*self.par.X/L_t)**self.par.alpha
+
+    # Law of motion
+
+    def L_t1(self, L_t, A_t):
+        return self.par.eta*((A_t*self.par.X)**self.par.alpha)*L_t**(1-self.par.alpha)+(1-self.par.mu)*L_t
+
+    # Population steady state
+
+    def L_ss(self, A_t):
+        return ((self.par.eta/self.par.mu)**(1/self.par.alpha))*A_t*self.par.X
+
+    # output per capita steady state:
+
+    def output_per_capita_ss(self):
+        return self.par.mu/self.par.eta
+    
+    def A_t1(self, A_t):
+        return A_t*(1+self.par.g_A)+np.random.normal(self.par.A_mean, self.par.A_sigma)
+    
+    
+    # Steady state solver
+
+
+    def solve_ss(self):
+        N = 1000
+        L_t = self.par.L_0
+        A_t = self.par.A_0
+        population = [self.par.L_0]
+        output_per_capita = [self.output_per_capita(self.par.L_0, self.par.A_0)]
+        time = [0]
+        ss_time = []
+        TFP = [self.par.A_0]
+
+        for iterations in range(0,N,1):
+            L_next = self.L_t1(L_t, A_t)
+            A_next = self.A_t1(A_t)
+            if L_t == L_next:
+                ss_time.append[time[-1]]
+            population.append(L_next)
+            output_per_capita.append(self.output_per_capita(L_next, A_next))
+            TFP.append(A_next)
+            time.append(time[-1] + 1)
+            L_t = L_next
+            A_t = A_next
+            
+        print("Periods in which steady state was reached:", ss_time)
+        print("Final population:", L_t)
+        print("Final income per capita:", self.output_per_capita(L_t, A_t))
+        print("Population: ", population)
+        print("Time passed", time)
+
+        fig, ax1 = plt.subplots()
+
+        color = 'tab:blue'
+        ax1.set_xlabel('Time')
+        ax1.set_ylabel('Population', color=color)
+        ax1.plot(time, population, color=color, label='Population')
+        ax1.tick_params(axis='y', labelcolor=color)
+
+        ax2 = ax1.twinx()  
+        color = 'tab:red'
+        ax2.set_ylabel('Output per capita', color=color)  
+        ax2.plot(time, output_per_capita, color=color, label='Output per capita')
+        ax2.tick_params(axis='y', labelcolor=color)
+
+        fig.tight_layout()  
+        plt.title("Population and Output per Capita over Time")
+        fig.legend(loc='center')
+        plt.show()
+
+        return
+   
