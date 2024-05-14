@@ -235,4 +235,3 @@ class MalthusEconomyStochasticTechnology:
         plt.show()
 
         return
-   
