@@ -136,7 +136,127 @@ class MalthusEconomyBaseline:
         fig.legend(loc='center')
         plt.show()
         return
-   
+
+class MalthusEconomyBaselineParametrization:
+
+    def __init__(self):
+
+        par = self.par = SimpleNamespace()
+
+        # a. preferences
+        par.alpha = 0.5
+        par.mu = 0.2
+        par.X = 1
+        par.A = 1
+        par.L_0 = 100
+
+    # Production function
+
+    def output(self, L_t,):
+        return L_t**(1-self.par.alpha)*(self.par.A*self.par.X)**self.par.alpha
+
+    # Output per capita
+
+    def output_per_capita(self, L_t):
+        return (self.par.A*self.par.X/L_t)**self.par.alpha
+
+    # Birth rate:
+
+    def birth_rate(self, L_t, eta):
+        return eta*(self.par.A*self.par.X/L_t)**self.par.alpha
+
+    # Law of motion
+
+    def L_t1(self, L_t, eta):
+        return eta*((self.par.A*self.par.X)**self.par.alpha)*L_t**(1-self.par.alpha)+(1-self.par.mu)*L_t
+
+    # Population steady state
+
+    def L_ss(self, eta):
+        return ((eta/self.par.mu)**(1/self.par.alpha))*self.par.A*self.par.X
+
+    # output per capita steady state:
+
+    def output_per_capita_ss(self, eta):
+        return self.par.mu/eta
+    
+    # Steady state solver
+
+
+    def solve_ss(self, eta):
+        L_t = self.par.L_0
+        population = [self.par.L_0]
+        output_per_capita = [self.output_per_capita(self.par.L_0)]
+        time = [0]
+
+        while L_t != self.L_t1(L_t, eta):
+            L_next = self.L_t1(L_t, eta)
+            population.append(L_next)
+            output_per_capita.append(self.output_per_capita(L_next))
+            time.append(time[-1] + 1)
+            L_t = L_next
+
+        return population, output_per_capita, time
+
+    def plot_solutions(self):
+        fig, ax1 = plt.subplots()
+
+        # Set up the primary y-axis (Population)
+        ax1.set_xlabel('Time')
+        ax1.set_ylabel('Population', color='blue') 
+        ax1.tick_params(axis='y', labelcolor='blue')
+
+        # Set up the secondary y-axis (Output per capita)
+        ax2 = ax1.twinx()
+        ax2.tick_params(axis='y', labelcolor='red')
+
+        # Loop through eta values and plot
+        eta_values = [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2]  # Corrected range
+        for eta in eta_values:
+            time = self.solve_ss(eta)[2]
+            population = self.solve_ss(eta)[0]
+            ax1.plot(time, population, label=f'Population (eta={eta})', alpha=0.7)
+            
+
+        # Combine the legends from both y-axes
+        lines, labels = ax1.get_legend_handles_labels()
+        lines2, labels2 = ax2.get_legend_handles_labels()
+        ax1.legend(lines + lines2, labels + labels2, loc='center left', bbox_to_anchor=(1.05, 0.5))
+
+        fig.tight_layout()  
+        plt.title("Population over Time")
+        plt.show()
+
+
+        # Plotting output per capita for different values of eta:
+
+        fig, ax1 = plt.subplots()
+
+        # Set up the primary y-axis (Population)
+        ax1.set_xlabel('Time')
+        ax1.tick_params(axis='y', labelcolor='blue')
+
+        # Set up the secondary y-axis (Output per capita)
+        ax2 = ax1.twinx()
+        ax2.set_ylabel('Output per capita', color='red')
+        ax2.tick_params(axis='y', labelcolor='red')
+
+        # Loop through eta values and plot
+        for eta in eta_values:
+            time = self.solve_ss(eta)[2]
+            output_per_capita = self.solve_ss(eta)[1]
+            ax2.plot(time, output_per_capita, label=f'Output per capita (eta={eta})', alpha=0.7)
+            
+
+        # Combine the legends from both y-axes
+        lines, labels = ax1.get_legend_handles_labels()
+        lines2, labels2 = ax2.get_legend_handles_labels()
+        ax1.legend(lines + lines2, labels + labels2, loc='center left', bbox_to_anchor=(1.05, 0.5))
+
+        fig.tight_layout()  
+        plt.title("Output per Capita over Time")
+        plt.show()
+        return   
 
 class MalthusEconomyStochasticTechnology:
 
